@@ -20,19 +20,19 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Countries API on Vercel
 
-Set `VITE_API_KEY` in the Vercel project's **Settings → Environment Variables**,
-using your REST Countries API key. Optionally set `VITE_COUNTRIES_API_URL` to
-`https://api.restcountries.com/countries/v5`. The older `VITE_WEATHER_API_URL`
-setting is still supported; a local `/api-countries/...` URL is automatically
-replaced with the public API URL in production because Vite's development proxy
-is not part of the static build.
+Production country requests use `/api/countries`, implemented by the Vercel
+function in `api/countries.js`. This function calls REST Countries server to
+server, so the browser hostname does not need to be added to the upstream key's
+CORS settings. Search and pagination parameters are forwarded to the fixed
+upstream endpoint; the browser receives the country data without the API key.
 
-In [REST Countries API Keys](https://restcountries.com/api-keys), allow the deployed
-hostname `react-hooks-alpha-sand.vercel.app` for this key. Add any custom domain or
-preview hostname you use as well. Browser calls require an allowed hostname.
+Set `COUNTRIES_API_KEY` in the Vercel project's **Settings → Environment Variables**
+to your REST Countries key, then redeploy the whole repository (including `api/`).
+The function also accepts the existing `VITE_API_KEY` environment variable for
+compatibility. Prefer `COUNTRIES_API_KEY` for production; it is a server-only
+variable. A static upload of `dist/` alone does not include the function.
 
-Redeploy after updating Vercel environment variables: Vite embeds them at build
-time. These `VITE_*` values are browser-visible; use a browser-scoped API key with
-the appropriate allowed origins. The app preserves pagination and displays clear
-errors for missing keys, API errors, and responses that contain a page instead of
-JSON.
+For local `npm run dev`, keep `VITE_API_KEY` in the ignored `.env` file. Vite uses
+its existing `/api-countries` proxy. The optional `VITE_COUNTRIES_API_URL` (or older
+`VITE_WEATHER_API_URL`) only overrides the local development endpoint. Test the
+complete production function locally with Vercel's development environment.

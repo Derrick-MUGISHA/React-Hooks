@@ -21,7 +21,7 @@ export function CountrySearch() {
         const data = await fetchCountries({
           baseUrl: import.meta.env.VITE_COUNTRIES_API_URL || import.meta.env.VITE_WEATHER_API_URL,
           isDev: import.meta.env.DEV,
-          apiKey: import.meta.env.VITE_API_KEY,
+          apiKey: import.meta.env.DEV ? import.meta.env.VITE_API_KEY : undefined,
           query,
           page,
           pageSize: PAGE_SIZE,
