@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import ApiDetails from "./ApiDetails";
+import { fetchCountries } from "./api/countries";
 
 const PAGE_SIZE = 6;
 
@@ -17,22 +18,21 @@ export function CountrySearch() {
     const controller = new AbortController();
     async function load() {
       try {
-        const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(page * PAGE_SIZE) });
-        if (query.trim()) params.set("q", query.trim());
-        const base = import.meta.env.VITE_WEATHER_API_URL || "/api-countries/countries/";
-        const res = await fetch(`${base.replace(/\/$/, "")}/v5?${params}`, {
+        const data = await fetchCountries({
+          baseUrl: import.meta.env.VITE_COUNTRIES_API_URL || import.meta.env.VITE_WEATHER_API_URL,
+          isDev: import.meta.env.DEV,
+          apiKey: import.meta.env.VITE_API_KEY,
+          query,
+          page,
+          pageSize: PAGE_SIZE,
           signal: controller.signal,
-          headers: { Authorization: `Bearer ${import.meta.env.VITE_API_KEY}` },
         });
-        const payload = await res.json();
         if (controller.signal.aborted) return;
-        if (!res.ok) throw new Error(payload.errors?.[0]?.message || `Could not load countries (HTTP ${res.status}).`);
-        if (!Array.isArray(payload.data?.objects)) throw new Error("The country service returned an unexpected response.");
-        const meta = payload.data.meta;
+        const meta = data.meta;
         setResult({
-          countries: payload.data.objects,
+          countries: data.objects,
           total: typeof meta?.total === "number" ? meta.total : null,
-          hasMore: meta?.more ?? (payload.data.objects.length === PAGE_SIZE),
+          hasMore: meta?.more ?? (data.objects.length === PAGE_SIZE),
         });
         setStatus("success");
       } catch (err) {
