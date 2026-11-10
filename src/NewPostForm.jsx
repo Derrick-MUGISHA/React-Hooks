@@ -33,17 +33,21 @@ export default function NewPostForm({ onCreated }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="title">Title</label>
+      <label className="field-label" htmlFor="title">Post title</label>
       <input
         id="title"
+        placeholder="What would you like to share?"
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? "post-error" : undefined}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <button type="submit" disabled={saving}>
-        {saving ? "Saving…" : "Publish"}
+      <button className="publish-button" type="submit" disabled={saving}>
+        {saving ? "Publishing…" : "Publish post"}<span aria-hidden="true">↗</span>
       </button>
-      {error && <p role="alert">{error}</p>}
-      {createdPost && <p role="status">Post created: {createdPost.title}</p>}
+      <p className="form-note">A space for a small thought or a big idea.<br />Demo posts are simulated and won’t be stored.</p>
+      {error && <p className="feedback error" id="post-error" role="alert">{error}</p>}
+      {createdPost && <p className="feedback success" role="status">Post created: {createdPost.title}</p>}
     </form>
   );
 }
